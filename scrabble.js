@@ -1,6 +1,11 @@
 var Scrabble = function() {
 
-  this.points = {
+// Wave 1: Scrabble functionality:
+
+};
+
+Scrabble.score = function(word) {
+  points = {
     "A": 1,
     "B": 3,
     "C": 3,
@@ -28,16 +33,14 @@ var Scrabble = function() {
     "Y": 4,
     "Z": 10
   };
-};
 
-Scrabble.prototype.score = function(word) {
   this.word = word.toUpperCase();
   var sum = 0;
   var bonus = 0;
-  for (var key in this.points) {
+  for (var key in points) {
     var count = 0;
     count += this.word.split(key).length - 1;
-    sum += count * this.points[key];
+    sum += count * points[key];
   }
 
   if (this.word.length == 7) {
@@ -47,8 +50,7 @@ Scrabble.prototype.score = function(word) {
   return sum;
 };
 
-Scrabble.prototype.highestScoreFrom = function(arrayOfWords) {
-
+Scrabble.highestScoreFrom = function(arrayOfWords) {
   var highestScore = ["", 0];
 
   for (var i = 0; i < arrayOfWords.length; i++) {
@@ -64,7 +66,7 @@ Scrabble.prototype.highestScoreFrom = function(arrayOfWords) {
   return highestScore[0];
 };
 
-Scrabble.prototype.tieBreaker = function(word1, word2) {
+Scrabble.tieBreaker = function(word1, word2) {
   if (word1[0].length > word2[0].length) {
     if (word1[0].length != 7) {
       return word2;
@@ -86,24 +88,93 @@ Scrabble.prototype.tieBreaker = function(word1, word2) {
   }
 };
 
-my_game = new Scrabble();
+// Wave 2: Player object:
 
-var triedWords = ["ZQQQQJ", "QQQQQJ", "DOG"];
-console.log(my_game.highestScoreFrom(triedWords));
+var Player = function(name) {
+  this.name = name;
+  this.wordsPlayed = [];
+};
 
-console.log("========");
+Player.prototype.plays = function() {
+  return this.wordsPlayed;
+};
 
-var triedWords = ["QQQQQJ", "GORILLA", "DOG"];
-console.log(my_game.highestScoreFrom(triedWords));
+Player.prototype.play = function(word) {
+  if (this.hasWon() === true) {
+    return false;
+  }
+  else {
+    this.wordsPlayed.push(word);
 
-console.log("========");
+    return this.wordsPlayed;
+  }
+};
 
-var triedWords = ["Hello", "world", "work", "please"];
-console.log(my_game.highestScoreFrom(triedWords));
+Player.prototype.totalScore = function() {
+  var sum = 0;
+  for (var i = 0; i < this.wordsPlayed.length; i++) {
+    sum += Scrabble.score(this.wordsPlayed[i]);
+  }
+  return sum;
+};
 
-console.log("========");
+Player.prototype.hasWon = function() {
 
-var triedWords = ["QQQQJ", "QQQQQJ", "ZZQQQJ", "DOG"];
-console.log(my_game.highestScoreFrom(triedWords));
+  if (this.totalScore() >= 100) {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+
+Player.prototype.highestScoringWord = function() {
+  return Scrabble.highestScoreFrom(this.wordsPlayed);
+};
+
+Player.prototype.highestWordScore = function() {
+  Scrabble.score(this.highestScoringWord());
+  return Scrabble.score(this.highestScoringWord());
+};
+
+
+// Scrabble Tests:
+// ----------------------------------------------
+// var my_game = new Scrabble();
+//
+// var triedWords = ["ZQQQQJ", "QQQQQJ", "DOG"];
+// console.log(Scrabble.highestScoreFrom(triedWords));
+//
+// console.log("========");
+//
+// var triedWords = ["QQQQQJ", "GORILLA", "DOG"];
+// console.log(Scrabble.highestScoreFrom(triedWords));
+//
+// console.log("========");
+//
+// var triedWords = ["Hello", "world", "work", "please"];
+// console.log(Scrabble.highestScoreFrom(triedWords));
+//
+// console.log("========");
+//
+// var triedWords = ["QQQQJ", "QQQQQJ", "ZZQQQJ", "DOG"];
+// console.log(Scrabble.highestScoreFrom(triedWords));
+
+// Player Tests:
+// ----------------------------------------------
+var my_game = new Scrabble();
+var playerJen = new Player("Jen");
+
+playerJen.play("QQQQQJ");
+console.log(playerJen.plays());
+console.log(playerJen.highestScoringWord());
+console.log(playerJen.highestWordScore());
+console.log(playerJen.hasWon());
+
+playerJen.play("GORILLA");
+console.log(playerJen.plays());
+console.log(playerJen.highestScoringWord());
+console.log(playerJen.highestWordScore());
+console.log(playerJen.hasWon());
 
 module.exports = Scrabble;
